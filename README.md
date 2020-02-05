@@ -25,6 +25,6 @@ Hw3: Metroplis Algorithm
 (3) Calculate the accepted ratio for each sample  
 (4) Randomly generate a number from the uniform distribution (0, 1)
 (5) Determine whether the training point is accepted and if so, add them to the current data pool  
-(5) Build the PDF distribution of the data pool  
-(6) Calculate the KL divergence value beween the current data pool and the initial sampling distribution for each variable
-(7) Determine whether the KL divergence value is stable, if so the state of each variable is stable  
+(6) Build the PDF distribution of the data pool  
+(7) Calculate the KL divergence value beween the current data pool and the initial sampling distribution for each variable  
+(8) Determine whether the KL divergence value is stable, if so the state of each variable is stable  
