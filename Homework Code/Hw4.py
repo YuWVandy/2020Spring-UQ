@@ -71,16 +71,31 @@ def likelihood(data, obs, P):
     
     return likeprob
 
-def Prior(sigma, u, data):
-    pE1 = scipy.stats.norm.pdf(data[0], u[0], sigma[0])
+#def Prior_nor(sigma, u, data):
+#    pE1 = scipy.stats.norm.pdf(data[0], u[0], sigma[0])
+#    
+#    pE2 = scipy.stats.norm.pdf(data[1], u[1], sigma[1])
+#    
+#    pE3 = scipy.stats.norm.pdf(data[2], u[2], sigma[2])
+#    
+#    pE4 = scipy.stats.norm.pdf(data[3], u[3], sigma[3])
+#    
+#    pnoi = scipy.stats.norm.pdf(data[4], u[4], sigma[4])
+#
+#    priorprob = [pE1, pE2, pE3, pE4, pnoi]
+#    
+#    return priorprob
+
+def Prior_uni(P_low, P_high, data):
+    pE1 = scipy.stats.uniform.pdf(data[0], P_low[0], P_high[0] - P_low[0])
     
-    pE2 = scipy.stats.norm.pdf(data[1], u[1], sigma[1])
+    pE2 = scipy.stats.uniform.pdf(data[1], P_low[1], P_high[1] - P_low[1])
     
-    pE3 = scipy.stats.norm.pdf(data[2], u[2], sigma[2])
+    pE3 = scipy.stats.uniform.pdf(data[2], P_low[2], P_high[2] - P_low[2])
     
-    pE4 = scipy.stats.norm.pdf(data[3], u[3], sigma[3])
+    pE4 = scipy.stats.uniform.pdf(data[3], P_low[3], P_high[3] - P_low[3])
     
-    pnoi = scipy.stats.norm.pdf(data[4], u[4], sigma[4])
+    pnoi = scipy.stats.uniform.pdf(data[4], P_low[4], P_high[4] - P_low[4])
 
     priorprob = [pE1, pE2, pE3, pE4, pnoi]
     
@@ -96,7 +111,7 @@ def accep(plike, pprior, psample, M):
             flag[i] = 1
         else:
             flag[i] = 0
-    
+            
     return flag
 
 def Plotdist(data, c, X_label, Name):#plot the distribution of the variable and calculate the discrete value
@@ -134,14 +149,18 @@ color = ['red', 'blue', 'green', 'brown', 'black', 'orange']
 X_label = ['the variable of E1', 'the variable of E2', 'the variable of E3', 'the variable of E4', 'P', 'noise']
 Name = ['E1', 'E2', 'E3', 'E4', 'P', 'Noise']
 
-
+#1 normalized, loglikelihood
 #Sampling Distribution - normal distribution
 S_sigma = [3000, 2700, 3200, 2500, 0.02]
 S_mean = [30000, 25000, 32000, 27000, 0.05]
 
-#Prior Distribution - normal distribution
-P_sigma = [1000, 2000, 3000, 2000, 0.02]
-P_mean = [25000, 20000, 28000, 22000, 0.07]
+##Prior Distribution - normal distribution
+#P_sigma = [1000, 2000, 3000, 2000, 0.02]
+#P_mean = [25000, 20000, 28000, 22000, 0.07]
+
+#uniform distribution
+P_low = [20000, 20000, 20000, 15000, 0.03]
+P_high = [30000, 30000, 30000, 25000, 0.09]
 
 E1, E2, E3, E4, Noise = [], [], [], [], []
 klE1, klE2, klE3, klE4, klnoi = [], [], [], [], []
@@ -157,11 +176,12 @@ for i in range(5):
 Temp = 0
 while(Temp <= 200):
     temp = 0
-    while(temp <= 1000):
+    while(temp <= 10000):
         data, Sprob = DataSample(S_sigma, S_mean)
         Lprob = likelihood(data, obs, P)
-        Pprob = Prior(P_sigma, P_mean, data)
-        flag = accep(Lprob, Pprob, Sprob, 1)
+#        Pprob = Prior_nor(P_sigma, P_mean, data)
+        Pprob = Prior_uni(P_low, P_high, data)
+        flag = accep(Lprob, Pprob, Sprob, 0.1)
         if(flag[0] == 1):
             E1.append(data[0])
             S_mean[0] = data[0]
@@ -210,22 +230,39 @@ plt.grid(True)
 #plt.savefig("InterStrength2.png", dpi = 2000, bbox_inches='tight') 
 plt.show()
 
-##Generate the samples from the prior distribution so that we can plot and compare
+###Generate the samples from the prior distribution so that we can plot and compare
+#psE1, psE2, psE3, psE4, psnoi = [], [], [], [], []
+#for i in range(len(E1)):
+#    psE1.append(np.random.normal(P_mean[0], P_sigma[0]))
+#    
+#for i in range(len(E2)):
+#    psE2.append(np.random.normal(P_mean[1], P_sigma[1]))
+#    
+#for i in range(len(E3)):
+#    psE3.append(np.random.normal(P_mean[2], P_sigma[2]))
+#    
+#for i in range(len(E4)):
+#    psE4.append(np.random.normal(P_mean[3], P_sigma[3]))
+#    
+#for i in range(len(Noise)):
+#    psnoi.append(np.random.normal(P_mean[4], P_sigma[4]))
+    
+#Generate the samples from the prior distribution_uniform
 psE1, psE2, psE3, psE4, psnoi = [], [], [], [], []
 for i in range(len(E1)):
-    psE1.append(np.random.normal(P_mean[0], P_sigma[0]))
+    psE1.append(np.random.uniform(P_low[0], P_high[0]))
     
 for i in range(len(E2)):
-    psE2.append(np.random.normal(P_mean[1], P_sigma[1]))
+    psE2.append(np.random.uniform(P_low[1], P_high[1]))
     
 for i in range(len(E3)):
-    psE3.append(np.random.normal(P_mean[2], P_sigma[2]))
+    psE3.append(np.random.uniform(P_low[2], P_high[2]))
     
 for i in range(len(E4)):
-    psE4.append(np.random.normal(P_mean[3], P_sigma[3]))
+    psE4.append(np.random.uniform(P_low[3], P_high[3]))
     
 for i in range(len(Noise)):
-    psnoi.append(np.random.normal(P_mean[4], P_sigma[4]))
+    psnoi.append(np.random.uniform(P_low[4], P_high[4]))
     
 #Plot the Prior Distribution and the final posterior distribution 
 PlotDistri2(psE1, E1, 'red', 'blue', 'The value of the variable E1', 'E1_Prior', 'E1', 'the Frequency', 0.4, 0.3)
