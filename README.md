@@ -19,7 +19,7 @@ Hw3: Gaussian Random Process Regression
 (5) Compare the results with using current existed Python package  
 
 ##----------------------------------------------------------  
-Hw3: Metroplis Algorithm  
+Hw4: Metroplis Algorithm  
 (1) Sampling training points from the random process generated during Hw2  
 (2) Calculate the PDF value for the sampling distribution and target distribution  
 (3) Calculate the accepted ratio for each sample  
