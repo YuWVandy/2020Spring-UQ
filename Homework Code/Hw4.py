@@ -176,7 +176,7 @@ for i in range(5):
 Temp = 0
 while(Temp <= 200):
     temp = 0
-    while(temp <= 10000):
+    while(temp <= 1000):
         data, Sprob = DataSample(S_sigma, S_mean)
         Lprob = likelihood(data, obs, P)
 #        Pprob = Prior_nor(P_sigma, P_mean, data)
