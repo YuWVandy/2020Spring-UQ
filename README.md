@@ -17,7 +17,7 @@ Hw3: Gaussian Random Process Regression
 (3) Training the noise part using gaussian random process regression  
 (4) Compare the results with the physics model, PCE model, least square model  
 (5) Compare the results with using current existed Python package  
-
+  
 ##----------------------------------------------------------  
 Hw4: Metroplis Algorithm  
 (1) Sampling training points from the random process generated during Hw2  
@@ -28,3 +28,11 @@ Hw4: Metroplis Algorithm
 (6) Build the PDF distribution of the data pool  
 (7) Calculate the KL divergence value beween the current data pool and the initial sampling distribution for each variable  
 (8) Determine whether the KL divergence value is stable, if so the state of each variable is stable  
+  
+##----------------------------------------------------------  
+Hw5: Particle Filtering
+(1) Sampling training points from the prior uniform distribution for 5 variables  
+(2) Sampling 5 independent points for physics model to calculate the observations  
+(3) Calculating the likelihood for training points (Normal distribution with observation as the mean value, the last variable as the std)  
+(4) Treating the likelihood as the PMF, calculating the CDF value for each training point  
+(5) Using the CDF value as the updated prior to do sampling in the new iteration  
