@@ -30,7 +30,7 @@ Hw4: Metroplis Algorithm
 (8) Determine whether the KL divergence value is stable, if so the state of each variable is stable  
   
 ##----------------------------------------------------------  
-Hw5: Particle Filtering
+Hw5: Particle Filtering  
 (1) Sampling training points from the prior uniform distribution for 5 variables  
 (2) Sampling 5 independent points for physics model to calculate the observations  
 (3) Calculating the likelihood for training points (Normal distribution with observation as the mean value, the last variable as the std)  
