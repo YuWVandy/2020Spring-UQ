@@ -36,3 +36,11 @@ Hw5: Particle Filtering
 (3) Calculating the likelihood for training points (Normal distribution with observation as the mean value, the last variable as the std)  
 (4) Treating the likelihood as the PMF, calculating the CDF value for each training point  
 (5) Using the CDF value as the updated prior to do sampling in the new iteration  
+
+##----------------------------------------------------------  
+Hw6: Sensitivity Analysis  
+(1) Double-loop Sampling to get training points from uniform distribution (Gaussian distribution if we don't do PCE analitical analysis)  
+(2) Calculating the elongation value using RGP model and PCE model  
+(3) Calculating the Sensitive index  
+(4) Applying PCE analitical solution to get the Sensitive index  
+(5) Compare the sensitivity index generated from different method    

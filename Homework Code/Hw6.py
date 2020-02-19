@@ -419,11 +419,17 @@ def Sample2PCE(x):
     return X
 
 
-Mean = [25000, 22000, 32000, 30000, 2000]
-Sig = [3000, 2700, 3200, 2500, 100]
+#Mean = [25000, 22000, 32000, 30000, 2000]
+#Sig = [3000, 2700, 3200, 2500, 100]
 
-#Mean = [2000, 30000, 30000, 30000, 30000]
-#Sig = [400, 3000, 3000, 3000, 3000]
+Up_E1, Up_E2, Up_E3, Up_E4 = 30000, 28000, 27000, 29000
+Low_E1, Low_E2, Low_E3, Low_E4 = 25000, 24000, 23000, 20000
+
+Up_P = 2000
+Low_P = 400
+
+Up = [Up_P, Up_E1, Up_E2, Up_E3, Up_E4]
+Low = [Low_P, Low_E1, Low_E2, Low_E3, Low_E4]
 
 Num1, Num2, Num3, Num4 = 5, 100, 100, 4
 SampleMatrix1 = np.zeros([Num1, Num2, Num3, Num4])
@@ -432,8 +438,20 @@ RGPYsigma = np.zeros([Num1, Num2, Num3])
 PCEYmean = np.zeros([Num1, Num2, Num3])
 SampleMatrix2 = np.zeros([Num1, Num2])
 
+def SampleUniform2(Up, Low, Num2):
+    X = np.zeros(Num2)
+    Xnorm = np.zeros(Num2)
+    erfa = (Up + Low)/2
+    beta = (Up - Low)/2
+    for i in range(Num2):
+        X[i] = np.random.uniform(Low, Up)
+        Xnorm[i] = (X[i] - erfa)/beta
+    return Xnorm    
+    
+    
+    
 for i in range(Num1):
-    SampleMatrix2[i, :] = SampleNormal(Mean[i], Sig[i], Num2)
+    SampleMatrix2[i, :] = SampleUniform2(Up[i], Low[i], Num2)
     for j in range(Num2):
         for k in range(Num3):
             Temp = 0
@@ -442,7 +460,7 @@ for i in range(Num1):
             x[i] = SampleMatrix2[i, j]
             for l in range(Num4 + 1):
                 if(l != i):
-                    SampleMatrix1[i, j, k, Temp] = SampleNormal(Mean[l], Sig[l], 1)
+                    SampleMatrix1[i, j, k, Temp] = SampleUniform2(Mean[l], Sig[l], 1)
                     x[l] = SampleMatrix1[i, j, k, Temp]
                     Temp += 1
             
@@ -468,14 +486,79 @@ def SensiVar(mean, Num1, Num2):
 RGPv, RGPvi = SensiVar(RGPYmean, Num1, Num2)
 PCEv, PCEvi = SensiVar(PCEYmean, Num1, Num2)
 
+#------------------------------------------------------------------------------Analytical sensitivity analysis for PCE
+Up_E1, Up_E2, Up_E3, Up_E4 = 30000, 28000, 27000, 29000
+Low_E1, Low_E2, Low_E3, Low_E4 = 25000, 24000, 23000, 20000
+
+Up_P = 2000
+Low_P = 400
+Num2 = 50
+
+def SampleUniform(Up, Low, Num2):
+    X = np.zeros(Num2)
+    Xnorm = np.zeros(Num2)
+    erfa = (Up + Low)/2
+    beta = (Up - Low)/2
+    for i in range(Num2):
+        X[i] = np.random.uniform(Low, Up)
+        Xnorm[i] = (X[i] - erfa)/beta
+    return X, Xnorm, erfa, beta
+    
 
 
+P, Pnorm, Perfa, Pbeta = SampleUniform(Up_P, Low_P, Num2)
+E1, E1norm, E1erfa, E1beta = SampleUniform(Up_E1, Low_E1, Num2)
+E2, E2norm, E2erfa, E2beta = SampleUniform(Up_E2, Low_E2, Num2)
+E3, E3norm, E3erfa, E3beta = SampleUniform(Up_E3, Low_E3, Num2)
+E4, E4norm, E4erfa, E4beta = SampleUniform(Up_E4, Low_E4, Num2)
+
+E = np.stack((E1, E2, E3, E4), axis = 0)
+Data = np.stack((P, E1, E2, E3, E4), axis = 0)
+Data_norm = np.stack((Pnorm, E1norm, E2norm, E3norm, E4norm), axis = 0)
+
+X_Data, Y = CalElong(E, P, L, Num2)
+
+#Surrogate Model
+#PCE Parameter
+def TrainData(RegNum, Data_Norm, DataNum):
+    X = np.zeros([DataNum, RegNum])
+    
+    Temp = 0
+    for i in range(DataNum):
+        f1, f2, f3, f4, f5 = Data_Norm[0, i], Data_Norm[1, i], Data_Norm[2, i], Data_Norm[3, i], Data_Norm[4, i]
+        f1f2, f1f3, f1f4, f1f5 = f1*f2, f1*f3, f1*f4, f1*f5
+        f2f3, f2f4, f2f5 = f2*f3, f2*f4, f2*f5
+        f3f4, f3f5 = f3*f4, f3*f5
+        f4f5 = f4*f5
+        f1_2, f2_2, f3_2, f4_2, f5_2 = f1**2-1, f2**2-1, f3**2-1, f4**2-1, f5**2-1
+        
+        X[Temp, 0], X[Temp, 1], X[Temp, 2], X[Temp, 3], X[Temp, 4], X[Temp, 5] = 1, f1, f2, f3, f4, f5
+        X[Temp, 6], X[Temp, 7], X[Temp, 8], X[Temp, 9], X[Temp, 10] = f1_2, f2_2, f3_2, f4_2, f5_2
+        X[Temp, 11], X[Temp, 12], X[Temp, 13], X[Temp, 14] = f1f2, f1f3, f1f4, f1f5
+        X[Temp, 15], X[Temp, 16], X[Temp, 17] = f2f3, f2f4, f2f5
+        X[Temp, 18], X[Temp, 19] = f3f4, f3f5
+        X[Temp, 20] = f4f5
+        Temp += 1
+    return X
+def Regression(X, Y):
+    Coeff = np.matmul(np.matmul(np.linalg.inv(np.matmul(X.transpose(), X)), X.transpose()), Y.reshape((len(Y), 1)))
+    return Coeff
+
+ParaNum = 5
+Order = 2
+RegNum = 21
+DataNum = len(Y)
+X = TrainData(RegNum, Data_norm, DataNum)
+Coeff = Regression(X, Y)
 
 
-
-
-
-
+Index = [[1, 6, 11, 12, 13, 14], [2, 7, 11, 15, 16, 17], [3, 8, 12, 15, 18, 19], [4, 9, 13, 16, 18, 20], [5, 10, 14, 17, 19, 20]]
+Sobol = np.zeros(5)
+fi = np.square(X)
+Sum = np.sum((Coeff[1:]**2)*(np.mean(X[1:]**2, axis = 0)))
+#Sum = np.sum((Coeff[1:]**2))
+for i in range(5):
+    Sobol[i] = np.sum((Coeff[Index[i]]**2)*(np.mean(X[Index[i]]**2, axis = 0)))/Sum
 
 
 
