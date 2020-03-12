@@ -44,3 +44,10 @@ Hw6: Sensitivity Analysis
 (3) Calculating the Sensitive index  
 (4) Applying PCE analitical solution to get the Sensitive index  
 (5) Compare the sensitivity index generated from different method    
+  
+##----------------------------------------------------------  
+Hw6: SVD decomponent  
+(1) Construct the covariance matrix for the 1st 450 data points  
+(2) Calculate the eigenvalue of the covariance matrix and select our the principal components  
+(3) Using principal components to transform and transform back the left 50 data points  
+(4) Comparing the newly generated data and calculate the percent of variability that can be explained  
